@@ -10,7 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/uws": "^10.149.0",
     "discord.js": "^11.5.1",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "winston": "^3.2.1"
   }
 }
