@@ -1,7 +1,7 @@
 "use strict";
 
-const queryAnime = require('./queryAnime');
+const anime = require('./anime');
 
 module.exports = {
-	queryAnime
+	anime
 };

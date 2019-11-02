@@ -1,5 +1,7 @@
 "use strict";
 
+const NUMBER_OF_ENTRIES_SHOWN = 5;
+
 class AnimeList {
 	constructor(animeList) {
 		this.list = animeList;
@@ -7,7 +9,7 @@ class AnimeList {
 
 	getDiscordList() {
 		const fullDisplayList = this.list.map((anime, idx) => `${idx}. ${anime.title}`);
-		return fullDisplayList.slice(0, 20);
+		return fullDisplayList.slice(0, NUMBER_OF_ENTRIES_SHOWN);
 	}
 
 	getAnimeByIndex(args) {
@@ -17,7 +19,7 @@ class AnimeList {
 		if (this.list && this.list.length && this.list[idx]) {
 			anime = this.list[idx];
 		} else {
-			err = new Error('I couldn\'t find anime for that number');
+			err = new Error('I couldn\'t find anime for that number.');
 		}
 		return {anime, err};
 	}

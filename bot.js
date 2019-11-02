@@ -6,11 +6,59 @@ const Store = require('./classes/store.js');
 const store = new Store();
 
 const MIN_SEARCH_LENGTH_MSG = 'I can\'t search without being given at least 3 characters!';
+const MISSING_ARGS_ERROR_MSG = 'Please give me at least one argument!';
 
 // commands
 const {
-	queryAnime
+	anime
 } = require('./commands');
+
+const commands = {
+	'ping': (message, args) => {
+		message.channel.send('pong')
+	},
+	'anime': (message, args) => {
+		if (!args || !args[0]) message.channel.send(MISSING_ARGS_ERROR_MSG);
+		else if (args.join(' ').length < 3) message.channel.send(MIN_SEARCH_LENGTH_MSG);
+		else {
+			message.channel.send(`Querying for your search: \'${args.join(' ')}\', ${message.author}`);
+			anime(args).then(res => {
+				const {animeList, err} = res;
+				if (err) message.channel.send(err.message);
+				else {
+					store.setAnimeList(animeList);
+					message.channel.send(animeList.getDiscordList());
+				}
+			});
+		}
+	},
+	'anime-info': (message, args) => {
+		// TODO: rewrite for cleaner code
+		console.log(store);
+		const animeList = store.getAnimeList();
+		if (animeList) {
+			const {anime, err} = animeList.getAnimeByIndex(args);
+			if (err) message.channel.send(err.message);
+			else {
+				const animeInfo = [];
+				animeInfo.push(`Title: ${anime.title}`);
+				animeInfo.push(`Score: ${anime.score}`);
+				animeInfo.push(`Synopsis: ${anime.synopsis}`);
+				animeInfo.push(`# of Episodes: ${anime.episodes}`);
+				animeInfo.push(`link: ${anime.url}`);
+				message.channel.send(animeInfo);
+			}
+		} else {
+			message.channel.send('No Anime List Found. Try !anime \'Search Term\'.');
+		}
+	}
+}
+
+const allCommands = Object.keys(commands);
+
+commands['help'] = (message, args) => {
+	message.channel.send(allCommands);
+}
 
 const logger = winston.createLogger({
 	level: 'info',
@@ -49,53 +97,11 @@ client.on('message', message => {
 		console.log('args:', args);
 		console.log('cmd:', cmd);
 
-
-		switch(action) {
-			case 'ping':
-				message.channel.send('pong')
-				break;
-			case 'anime':
-				console.log(args);
-				if (!args || !args[0] || args[0].length < 3) {
-					message.channel.send(MIN_SEARCH_LENGTH_MSG);
-				} else {
-					message.channel.send(`Querying for your search: \'${args.join(' ')}\', ${message.author}`);
-					queryAnime(message, args).then(res => {
-						const {animeList, err} = res;
-						if (err) message.channel.send(err.message);
-						else {
-							store.setAnimeList(animeList);
-							message.channel.send(animeList.getDiscordList());
-						}
-					});
-				}
-				break;
-			case 'anime-info':
-				// TODO: rewrite for cleaner code
-				const animeList = store.getAnimeList();
-				if (animeList) {
-					const {anime, err} = animeList.getAnimeByIndex(args);
-					if (err) message.channel.send('Could not find anime');
-					else {
-						const animeInfo = [];
-						animeInfo.push(`Title: ${anime.title}`);
-						animeInfo.push(`Score: ${anime.score}`);
-						animeInfo.push(`Synopsis: ${anime.synopsis}`);
-						animeInfo.push(`# of Episodes: ${anime.episodes}`);
-						animeInfo.push(`link: ${anime.url}`);
-						message.channel.send(animeInfo);
-					}
-				} else {
-					message.channel.send('No Anime List Found. Try !anime \'Search Term\'.');
-				}
-				break;
-			case 'help':
-				message.channel.send('I need to implement this.');
-				break;
-			default:
-				message.channel.send(`I don\'t understand ${action}.`);
+		if (commands[action]) {
+			commands[action](message, args);
+		} else {
+			message.channel.send(`I don\'t understand ${action}.`);
 		}
-	}
 });
 
 client.login(auth.token);
