@@ -1,19 +1,17 @@
 "use strict";
 
-const NUMBER_OF_ENTRIES_SHOWN = 5;
-
 class AnimeList {
 	constructor(animeList) {
 		this.list = animeList;
 	}
 
-	getDiscordList() {
-		const fullDisplayList = this.list.map((anime, idx) => `${idx}. ${anime.title}`);
-		return fullDisplayList.slice(0, NUMBER_OF_ENTRIES_SHOWN);
+	getDisplayList(numberOfEntries) {
+		const fullDisplayList = this.list.map((anime, idx) => `${idx + 1}.  Score: ${anime.score}, ${anime.title}`);  // arrays are 0 indexed but lists typically aren't
+		return fullDisplayList.slice(0, numberOfEntries);
 	}
 
 	getAnimeByIndex(args) {
-		const idx = args[0];
+		const idx = args[0] - 1; // accounting for 0 indexing here.
 		let anime = {};
 		let err = null;
 		if (this.list && this.list.length && this.list[idx]) {

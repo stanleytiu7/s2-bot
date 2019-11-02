@@ -11,8 +11,13 @@ function validateArgsRequired(args) {
 
 function validateArgsMinimumLength(args, length) {
 	let err = null;
-	if (args.join(' ').length < length) err = new Error(`I can\'t search without being given at least ${length} characters!`);
+	if (args.join(' ').length < length) err = new Error(`Arguments need to be > ${length} characters!`);
 	return err;
+}
+
+function validateArgsMaximumLength(args, length) {
+	let err = null;
+	if (args.join(' ').length <= length) err = new Error(`Arguments need to be < ${length} characters!`);
 }
 
 module.exports = {

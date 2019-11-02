@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const winston = require('winston');
 const auth = require('../auth.json');
+const AnimeList = require('./classes/animeList');
 
 const Store = require('./classes/store.js');
 const store = new Store();
@@ -9,7 +10,8 @@ const store = new Store();
  * command related logic in their own files, all message sending logic exists here... (for now)
  */
 const {
-	anime
+	jikanQuery,
+	animeInfo
 } = require('./commands');
 
 /**
@@ -21,41 +23,43 @@ const commands = {
 		message.channel.send('pong')
 	},
 	'anime': (message, args) => {
-		message.channel.send(`Querying for your search: \'${args.join(' ')}\', ${message.author}`);
-		anime(args).then(res => {
-			const {animeList, err} = res;
+		message.channel.send(`Querying for your search: \"${args.join(' ')}\", ${message.author}`);
+		jikanQuery(args, 'anime').then(res => {
+			const {data, err} = res;
 			if (err) message.channel.send(err.message);
 			else {
-				store.setAnimeList(animeList);
-				message.channel.send(animeList.getDiscordList());
+				const animeListInstance = new AnimeList(data.results)
+				store.setAnimeList(animeListInstance);
+				message.channel.send(animeListInstance.getDisplayList(5));
 			}
 		});
 	},
 	'anime-info': (message, args) => {
 		// TODO: rewrite for cleaner code
 		const animeList = store.getAnimeList();
-		if (animeList) {
-			const {anime, err} = animeList.getAnimeByIndex(args);
+		const { animeInfoMsg, err } = animeInfo(animeList, args);
+		if (err) message.channel.send(err.message);
+		else message.channel.send(animeInfoMsg);
+		
+	},
+	'test-MAL-user': (message, args) => {
+		message.channel.send(`Querying for user: \"${args[0]}\", ${message.author}`);
+		jikanQuery(args, 'user').then(res => {
+			const { data, err } = res;
 			if (err) message.channel.send(err.message);
 			else {
-				const animeInfo = [];
-				animeInfo.push(`Title: ${anime.title}`);
-				animeInfo.push(`Score: ${anime.score}`);
-				animeInfo.push(`Synopsis: ${anime.synopsis}`);
-				animeInfo.push(`# of Episodes: ${anime.episodes}`);
-				animeInfo.push(`link: ${anime.url}`);
-				message.channel.send(animeInfo);
+				const userAnimeList = data.anime;
+				const animeListInstance = new AnimeList(userAnimeList);
+				message.channel.send(animeListInstance.getDisplayList(30));
 			}
-		} else {
-			message.channel.send('No Anime List Found. Try !anime \'Search Term\'.');
-		}
+		})
+		
 	},
 	'register-MAL': (message, args) => {
-
 	}
 }
 
-const allCommands = Object.keys(commands);
+const allCommands = Object.keys(commands).sort();
 
 /**
  * !help

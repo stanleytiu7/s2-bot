@@ -1,9 +1,9 @@
 "use strict";
 
-const anime = require('./anime');
+const jikanQuery = require('./jikanQuery');
 const animeInfo = require('./animeInfo');
 
 module.exports = {
-	anime,
+	jikanQuery,
 	animeInfo
 };
