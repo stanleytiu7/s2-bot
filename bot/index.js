@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const winston = require('winston');
-const auth = require('./auth.json');
+const auth = require('../auth.json');
 
 const Store = require('./classes/store.js');
 const store = new Store();
@@ -34,7 +34,6 @@ const commands = {
 	},
 	'anime-info': (message, args) => {
 		// TODO: rewrite for cleaner code
-		console.log(store);
 		const animeList = store.getAnimeList();
 		if (animeList) {
 			const {anime, err} = animeList.getAnimeByIndex(args);
@@ -51,6 +50,8 @@ const commands = {
 		} else {
 			message.channel.send('No Anime List Found. Try !anime \'Search Term\'.');
 		}
+	},
+	'register-MAL': (message, args) => {
 	}
 }
 
