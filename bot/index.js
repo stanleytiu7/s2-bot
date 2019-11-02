@@ -8,11 +8,17 @@ const store = new Store();
 const MIN_SEARCH_LENGTH_MSG = 'I can\'t search without being given at least 3 characters!';
 const MISSING_ARGS_ERROR_MSG = 'Please give me at least one argument!';
 
-// commands
+/**
+ * command related logic in their own files, all message sending logic exists here... (for now)
+ */
 const {
 	anime
 } = require('./commands');
 
+/**
+ * COMMANDS
+ * keep in config object to allow for easy help command
+ */
 const commands = {
 	'ping': (message, args) => {
 		message.channel.send('pong')
@@ -52,15 +58,22 @@ const commands = {
 		}
 	},
 	'register-MAL': (message, args) => {
+
 	}
 }
 
 const allCommands = Object.keys(commands);
 
+/**
+ * !help
+ */
 commands['help'] = (message, args) => {
 	message.channel.send(allCommands);
 }
 
+/**
+ * Logger instantiation
+ */
 const logger = winston.createLogger({
 	level: 'info',
 	format: winston.format.json(),
@@ -71,15 +84,18 @@ const logger = winston.createLogger({
 	]
 });
 
-// Configure logger settings
-// logger.remove(logger.transports.Console);
-// colorize: true
+/** Configure logger settings
+ * logger.remove(logger.transports.Console);
+ */ colorize: true
 logger.add(new winston.transports.Console({
 	format: winston.format.simple()
 }));
 
 logger.level = 'debug';
-// Initialize Discord Bot
+
+/**
+ * Init the Discord Client to dig into methods + events
+ */
 const client = new Discord.Client();
 
 client.on('ready', function (evt) {
@@ -94,9 +110,10 @@ client.on('message', message => {
 		const cmd = message.content.slice(1);
 		const split = cmd.split(' ');
 		const [action, ...args] = split;
-		console.log('action:', action);
-		console.log('args:', args);
-		console.log('cmd:', cmd);
+
+		// console.log('action:', action);
+		// console.log('args:', args);
+		// console.log('cmd:', cmd);
 
 		if (commands[action]) {
 			commands[action](message, args);

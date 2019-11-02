@@ -29,13 +29,13 @@ function init() {
 
 /**
  * Queries jikan's API for anime
- * returns {anime, err} - where 
+ * returns {animeList, err} 
+ * animeList - [anime], see class animeList for shape
  * err - is the error Object if we hit an error 
  */
 async function handleExternalAPI (args) {
 	let err = null;
 	let animeList = [];
-	console.log('handleExternal', args);
 
 	const BASE_API_ROUTE = 'https://api.jikan.moe/v3';
 	const SEARCH_ANIME_ROUTE = '/search/anime'
