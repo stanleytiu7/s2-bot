@@ -2,6 +2,7 @@
 
 const request = require('request-promise');
 const AnimeList = require('../classes/animeList');
+const utils = require('./utils');
 
 
 /**
@@ -12,14 +13,15 @@ function init() {
 
 	let queryDelay = false;
 	const JIKAN_DELAY = 4000; // ms
-	const JIKAN_DELAY_MSG = 'Please wait, currently delayed since last request.';
+	const JIKAN_MINIMUM_QUERY_LENGTH = 3;
 	return async function (args = []) {
-		if (queryDelay) {
-			return {
-				animeList: [], 
-				err: new Error(`${JIKAN_DELAY_MSG}`)
-			};
-		} else {
+		let err = null;
+		let animeList = [];
+		err = utils.validateArgsRequired(args) 
+			|| utils.validateArgsMinimumLength(args, JIKAN_MINIMUM_QUERY_LENGTH) 
+			|| validateQueryDelay(queryDelay);
+		if (err) return { animeList, err }
+		else {
 			queryDelay = true;
 			setTimeout(() => queryDelay = false, JIKAN_DELAY);
 			return await handleExternalAPI(args);
@@ -61,6 +63,12 @@ async function handleExternalAPI (args) {
 	};
 };
 
+function validateQueryDelay(queryDelay) {
+	let err = null;
+	const JIKAN_DELAY_MSG = 'Please wait, currently delayed since last request.';
+	if (queryDelay) err = new Error(`${JIKAN_DELAY_MSG}`);
+	return err;
+}
 
 
 module.exports = init();

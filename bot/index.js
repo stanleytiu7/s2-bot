@@ -5,9 +5,6 @@ const auth = require('../auth.json');
 const Store = require('./classes/store.js');
 const store = new Store();
 
-const MIN_SEARCH_LENGTH_MSG = 'I can\'t search without being given at least 3 characters!';
-const MISSING_ARGS_ERROR_MSG = 'Please give me at least one argument!';
-
 /**
  * command related logic in their own files, all message sending logic exists here... (for now)
  */
@@ -24,19 +21,15 @@ const commands = {
 		message.channel.send('pong')
 	},
 	'anime': (message, args) => {
-		if (!args || !args[0]) message.channel.send(MISSING_ARGS_ERROR_MSG);
-		else if (args.join(' ').length < 3) message.channel.send(MIN_SEARCH_LENGTH_MSG);
-		else {
-			message.channel.send(`Querying for your search: \'${args.join(' ')}\', ${message.author}`);
-			anime(args).then(res => {
-				const {animeList, err} = res;
-				if (err) message.channel.send(err.message);
-				else {
-					store.setAnimeList(animeList);
-					message.channel.send(animeList.getDiscordList());
-				}
-			});
-		}
+		message.channel.send(`Querying for your search: \'${args.join(' ')}\', ${message.author}`);
+		anime(args).then(res => {
+			const {animeList, err} = res;
+			if (err) message.channel.send(err.message);
+			else {
+				store.setAnimeList(animeList);
+				message.channel.send(animeList.getDiscordList());
+			}
+		});
 	},
 	'anime-info': (message, args) => {
 		// TODO: rewrite for cleaner code
