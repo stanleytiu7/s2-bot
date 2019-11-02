@@ -102,6 +102,7 @@ client.on('message', message => {
 		} else {
 			message.channel.send(`I don\'t understand ${action}.`);
 		}
+	}
 });
 
 client.login(auth.token);
